@@ -1,0 +1,23 @@
+Request:
+	Url: google.com
+	Query:
+		name: John
+		age: 40
+	Headers:
+		SecFetchSite: site
+		SecFetchDesc: user
+		SecFetchMode: one
+	Body:
+		"""
+		This is segment pair
+		{ "name": "John", "age": 99 }
+		"""
+
+User:
+	Name: John
+	Age: 50
+
+List:
+	- item1
+	- item2
+	- item3
