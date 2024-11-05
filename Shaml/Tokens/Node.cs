@@ -185,6 +185,7 @@ namespace Shaml.Tokens
 
 					break;
 
+				case System.Type when itemType == typeof(DateTime):
 				case System.Type when itemType.IsPrimitive:
 
 					MethodInfo method_tryParse = itemType.GetMethod(
