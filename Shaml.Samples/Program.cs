@@ -1,19 +1,28 @@
-﻿using Shaml.Models;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using Shaml.Models;
 using Shaml.Tokens;
 
 namespace Shaml.Samples
 {
 	public class Program
 	{
-		public static void Deserialize()
+		public class ShamlBenchmark
 		{
-			using StreamReader reader = new("request.shaml");
-
-			ReadOnlyMemory<char> buffer = reader.ReadToEnd().AsMemory();
-
-			IToken[] collection = new IToken[]
+			private readonly string _text;
+			private readonly ReadOnlyMemory<char> _buffer;
+			private readonly IToken[] _collection;
+			public ShamlBenchmark()
 			{
-				new Node(buffer)
+				using StreamReader reader = new("request.shaml");
+
+				_text = reader.ReadToEnd();
+
+				_buffer = _text.AsMemory();
+
+				_collection = new IToken[]
+				{
+				new Node(_buffer)
 				{
 					/// Request
 					Key = new Mark(0, 6),
@@ -21,7 +30,7 @@ namespace Shaml.Samples
 					{
 						/// Url: google.com
 						new Pair() { Key = new Mark(10, 12), Value = new Mark(15, 24) },
-						new Node(buffer)
+						new Node(_buffer)
 						{
 							/// Query
 							Key = new Mark(27, 31),
@@ -33,7 +42,7 @@ namespace Shaml.Samples
 								new Pair() { Key = new Mark(49, 51), Value = new Mark(54, 55) },
 							}
 						},
-						new Node(buffer)
+						new Node(_buffer)
 						{
 							/// Headers
 							Key = new Mark(58, 64),
@@ -59,7 +68,7 @@ namespace Shaml.Samples
 						},
 					},
 				},
-				new Node(buffer)
+				new Node(_buffer)
 				{
 					/// User
 					Key = new Mark(204, 207),
@@ -71,7 +80,7 @@ namespace Shaml.Samples
 						new Pair() { Key = new Mark(223, 225), Value = new Mark(228, 229) },
 					}
 				},
-				new Node(buffer)
+				new Node(_buffer)
 				{
 					/// List
 					Key = new Mark(232, 235),
@@ -85,14 +94,23 @@ namespace Shaml.Samples
 						new Item() { Value = new Mark(259, 263) }
 					}
 				}
-			};
+				};
+			}
 
-			GoogleApi googleApi = ShamlConverter.Deserialize<GoogleApi>(buffer, collection);
+			[Benchmark]
+			public void Deserialize()
+			{
+				GoogleApi googleApi = ShamlConverter.Deserialize<GoogleApi>(_buffer, _collection);
+			}
 		}
+
 
 		public static void Main(string[] args)
 		{
-			Deserialize();
+			BenchmarkRunner.Run<ShamlBenchmark>();
+
+			//new ShamlBenchmark().Deserialize();
+
 		}
 	}
 }
