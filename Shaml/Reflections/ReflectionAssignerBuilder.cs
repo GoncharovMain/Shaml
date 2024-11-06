@@ -8,10 +8,12 @@ namespace Shaml.Reflections
 		private readonly Type _type;
 		private MemberTypes _memberTypes;
 		private BindingFlags _bindingFlags;
+		private object _instance;
 
-		public ReflectionAssignerBuilder(Type type)
+		public ReflectionAssignerBuilder(object instance)
 		{
-			_type = type;
+			_instance = instance;
+			_type = instance.GetType();
 			_memberTypes = Token.SetterMemberTypes;
 			_bindingFlags = Token.PublicMembers;
 		}
@@ -36,17 +38,14 @@ namespace Shaml.Reflections
 			switch (memberInfo)
 			{
 				case PropertyInfo property:
-					return new ReflectionAssigner()
+					return new ReflectionAssigner(_instance, property.GetValue, property.SetValue)
 					{
-						SetValue = property.SetValue,
 						MemberType = property.PropertyType,
 					};
 
 				case FieldInfo field:
-					return new ReflectionAssigner()
+					return new ReflectionAssigner(_instance, field.GetValue, field.SetValue)
 					{
-
-						SetValue = field.SetValue,
 						MemberType = field.DeclaringType,
 					};
 				default:

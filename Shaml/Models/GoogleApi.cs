@@ -5,5 +5,6 @@ namespace Shaml.Models
 		public Request Request { get; set; }
 		public User User { get; set; }
 		public List<string> List { get; set; }
+		public string Text { get; set; }
 	}
 }

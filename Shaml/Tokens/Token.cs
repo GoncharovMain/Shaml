@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
@@ -7,7 +9,7 @@ namespace Shaml.Tokens
 		TokenType Type { get; }
 	}
 
-	public abstract class Token
+	public abstract class Token : IToken
 	{
 		public const BindingFlags PublicMembers =
 			BindingFlags.Instance |
@@ -36,6 +38,13 @@ namespace Shaml.Tokens
 		};
 
 		protected ReadOnlyMemory<char> _buffer;
+		
+		public abstract TokenType Type { get; }		
 		public Token(ReadOnlyMemory<char> buffer) => _buffer = buffer;
+
+		internal abstract void Assign(ReflectionAssignerBuilder builder);
+
+		public abstract string ToObject();
+		//public abstract Token this[string token] { get; }
 	}
 }
