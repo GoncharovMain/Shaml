@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using Shaml.Models;
 using Shaml.Tokens;
 
@@ -61,7 +60,7 @@ namespace Shaml.Samples
 				GoogleApi googleApi2 = assignerGoogleApi.Assign(new GoogleApi());
 
 				GoogleApi googleApi3 = ShamlConverter.Deserialize<GoogleApi>(_buffer);
-			
+
 			}
 		}
 

@@ -230,7 +230,7 @@ namespace Shaml.Tokens
 			{
 				token.Assign(reflectionAssignerBuilder);
 			}
-		
+
 			return instance;
 		}
 		internal object CreateInstanceOfList(Type listType)

@@ -1,5 +1,5 @@
-using Shaml.Reflections;
 using Shaml.Extension;
+using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
@@ -11,7 +11,7 @@ namespace Shaml.Tokens
 		public Item(ReadOnlyMemory<char> buffer) : base(buffer) { }
 		internal override void Assign(ReflectionAssignerBuilder builder)
 		{
-			
+
 		}
 
 		public override string ToObject()

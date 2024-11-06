@@ -1,7 +1,6 @@
 using System.Text;
-using System;
-using Shaml.Reflections;
 using Shaml.Extension;
+using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {

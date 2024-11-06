@@ -1,7 +1,6 @@
 using System.Reflection;
-using System;
-using Shaml.Reflections;
 using Shaml.Extension;
+using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
@@ -11,7 +10,7 @@ namespace Shaml.Tokens
 		public Mark Key { get; set; }
 		public Mark Value { get; set; }
 		public Pair(ReadOnlyMemory<char> buffer) : base(buffer) { }
-		
+
 		internal override void Assign(ReflectionAssignerBuilder reflectionAssignerBuilder)
 		{
 			ReadOnlySpan<char> span = _buffer.Span;
