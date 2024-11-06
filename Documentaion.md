@@ -23,3 +23,12 @@ class Person
   public int Age { get; set; }
 }
 ```
+
+Example template **scalar to scalar**
+
+```
+text: scalar
+foo: ${text}
+
+result: foo => "scalar"
+```
