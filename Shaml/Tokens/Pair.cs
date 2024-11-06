@@ -4,7 +4,7 @@ using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
-	public class Pair : Token, IToken
+	public class Pair : Token
 	{
 		public override TokenType Type => TokenType.Pair;
 		public Mark Key { get; set; }

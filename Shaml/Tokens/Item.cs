@@ -3,7 +3,7 @@ using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
-	public class Item : Token, IToken
+	public class Item : Token
 	{
 		public int Index { get; init; }
 		public override TokenType Type => TokenType.Item;

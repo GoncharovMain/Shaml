@@ -37,8 +37,7 @@ namespace Shaml.Tokens
 		public Token(ReadOnlyMemory<char> buffer) => _buffer = buffer;
 
 		internal abstract void Assign(ReflectionAssignerBuilder builder);
-
 		public abstract string ToObject();
-		//public abstract Token this[string token] { get; }
+		// public T ToObject<T>();
 	}
 }

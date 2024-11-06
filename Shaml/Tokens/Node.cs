@@ -4,7 +4,7 @@ using Shaml.Reflections;
 
 namespace Shaml.Tokens
 {
-	public class Node : Token, IToken
+	public class Node : Token
 	{
 		public Node(ReadOnlyMemory<char> buffer) : base(buffer) { }
 
@@ -144,8 +144,6 @@ namespace Shaml.Tokens
 			}
 		}
 
-		/// This method as alternate for <see cref="CreateInstanceOfDictionary"/>
-		/// Only adds pairs to an existing dictionary.
 		internal void SupplementInstanceWithPairs(object dictionary)
 		{
 			Type dictionaryType = dictionary.GetType();
@@ -293,86 +291,9 @@ namespace Shaml.Tokens
 		}
 		internal object CreateInstanceOfDictionary(Type dictionaryType)
 		{
-			ReadOnlySpan<char> span = _buffer.Span;
-
-			Type[] argumentsGenericTypes = dictionaryType.GetGenericArguments();
-
-			Type keyType = argumentsGenericTypes[0];
-			Type valueType = argumentsGenericTypes[1];
-
 			object dictionary = Activator.CreateInstance(dictionaryType, Collection.Length);
 
-			if (Collection.Length == 0)
-			{
-				return dictionary;
-			}
-
-			MethodInfo method_add = dictionaryType.GetMethod("Add");
-
-			MethodInfo method_containsKey = dictionaryType.GetMethod("ContainsKey");
-
-			switch (valueType)
-			{
-				case System.Type when keyType == typeof(string) && valueType == typeof(string):
-					{
-						foreach (Pair pair in Collection)
-						{
-							(string key, string value) = span.Slice(pair);
-
-							if ((bool)method_containsKey.Invoke(dictionary, new object[] { key }))
-							{
-								continue;
-							}
-
-							method_add.Invoke(dictionary, new object[] { key, value });
-						}
-
-						break;
-					}
-
-				/// The primitive types are Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Char, Double, and Single.
-				case System.Type when keyType.IsPrimitive && valueType.IsPrimitive:
-					{
-						MethodInfo methodKey_tryParse = keyType.GetMethod(
-							name: "TryParse",
-							types: new[] { typeof(string), keyType.MakeByRefType() }
-						);
-
-						MethodInfo methodValue_tryParse = valueType.GetMethod(
-							name: "TryParse",
-							types: new[] { typeof(string), valueType.MakeByRefType() }
-						);
-
-
-						if (methodKey_tryParse == null || methodValue_tryParse == null)
-						{
-							return default;
-						}
-
-						foreach (Pair pair in Collection)
-						{
-							(string key, string value) = span.Slice(pair);
-
-							object[] parametersKey = new object[] { key, null };
-							object[] parametersValue = new object[] { value, null };
-
-							bool successKey = (bool)methodKey_tryParse.Invoke(null, parametersKey);
-							bool successValue = (bool)methodValue_tryParse.Invoke(null, parametersValue);
-
-							if (successKey && successValue)
-							{
-								if ((bool)method_containsKey.Invoke(dictionary, new object[] { key }))
-								{
-									continue;
-								}
-
-								method_add.Invoke(dictionary, new object[] { parametersKey[1], parametersValue[1] });
-							}
-						}
-
-						break;
-					}
-			}
+			SupplementInstanceWithPairs(dictionary);
 
 			return dictionary;
 		}
