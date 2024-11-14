@@ -14,7 +14,7 @@ namespace Shaml.Tokens
 		public const MemberTypes SetterMemberTypes =
 			MemberTypes.Property |
 			MemberTypes.Field;
-
+		
 		public static readonly Type[] PrimitiveTypes =
 		{
 			typeof(byte),
@@ -34,7 +34,7 @@ namespace Shaml.Tokens
 		protected ReadOnlyMemory<char> _buffer;
 
 		public abstract TokenType Type { get; }
-		public Token(ReadOnlyMemory<char> buffer) => _buffer = buffer;
+		protected Token(ReadOnlyMemory<char> buffer) => _buffer = buffer;
 
 		internal abstract void Assign(ReflectionAssignerBuilder builder);
 		public abstract string ToObject();

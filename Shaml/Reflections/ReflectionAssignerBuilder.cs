@@ -1,5 +1,9 @@
 ﻿using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.InteropServices;
 using Shaml.Tokens;
+using System.Runtime.CompilerServices;
 
 namespace Shaml.Reflections
 {
@@ -8,8 +12,7 @@ namespace Shaml.Reflections
 		private readonly Type _type;
 		private MemberTypes _memberTypes;
 		private BindingFlags _bindingFlags;
-		private object _instance;
-
+		private readonly object _instance;
 		public ReflectionAssignerBuilder(object instance)
 		{
 			_instance = instance;
@@ -33,21 +36,21 @@ namespace Shaml.Reflections
 		{
 			MemberInfo memberInfo = _type.GetMember(name: memberName,
 				type: _memberTypes,
-				bindingAttr: _bindingFlags).First();
-
+				bindingAttr: _bindingFlags).FirstOrDefault();
+			
 			switch (memberInfo)
 			{
 				case PropertyInfo property:
-					return new ReflectionAssigner(_instance, property.GetValue, property.SetValue)
-					{
-						MemberType = property.PropertyType,
-					};
+					return new ReflectionAssigner(instance: _instance,
+						memberType: property.PropertyType,
+						getValue: property.GetValue,
+						setValue: property.SetValue);
 
 				case FieldInfo field:
-					return new ReflectionAssigner(_instance, field.GetValue, field.SetValue)
-					{
-						MemberType = field.DeclaringType,
-					};
+					return new ReflectionAssigner(instance: _instance,
+						memberType: field.FieldType,
+						getValue: field.GetValue,
+						setValue: field.SetValue);
 				default:
 					return null;
 			};

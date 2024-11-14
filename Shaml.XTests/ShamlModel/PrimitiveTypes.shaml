@@ -1,0 +1,24 @@
+ByteProperty: 200
+ByteField: 200
+UshortProperty: 8871
+UshortField: 8871
+ShortProperty: 8871
+ShortField: 8871
+UintProperty: 0xffffffff
+UintField: 0xffffffff
+IntProperty: 0x7fffffff
+IntField: 0x7fffffff
+UlongProperty: 0xffffffffffffffff
+UlongField: 0xffffffffffffffff
+LongProperty: 9223372036854775806
+LongField: 9223372036854775805
+FloatProperty: 2.7182
+FloatField: 3.1415
+DoubleProperty: 2.718281828459045
+DoubleField: 3.141592653589793
+DecimalProperty: 2.718281828459045
+DecimalField: 3.141592653589793
+BoolProperty: True
+BoolField: False
+DateTimeProperty: 20.07.2015 0:00:00
+DateTimeField: 20.07.2015 0:00:00

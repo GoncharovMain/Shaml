@@ -6,8 +6,8 @@ namespace Shaml.Tokens
 	public class Item : Token
 	{
 		public int Index { get; init; }
+		public Mark Value { get; init; }
 		public override TokenType Type => TokenType.Item;
-		public Mark Value { get; set; }
 		public Item(ReadOnlyMemory<char> buffer) : base(buffer) { }
 		internal override void Assign(ReflectionAssignerBuilder builder)
 		{

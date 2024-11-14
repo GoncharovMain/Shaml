@@ -1,4 +1,4 @@
-Request:
+﻿Request:
 	Url: google.com
 	Query:
 		name: John
@@ -21,3 +21,57 @@ List:
 	- item1
 	- item2
 	- item3
+
+
+Host: google.com
+
+
+GoogleInitialize<GetRequest>:
+	Method: GET
+	Url: https://${Host}/
+	Headers:
+		Host: google.com
+		UserAgent: Mozilla/5.0
+		Referrer: https://google.com/
+
+GoogleUser<PostRequest>:
+	Method: POST
+	Url: https://google.com/
+	Headers:
+		Host: google.com
+		UserAgent: Mozilla/5.0
+		Referrer: https://google.com/
+		Origin: https://google.com
+	MimeType: application/x-www-form-urlencoded; charset=UTF-8
+	Body<JsonBody>:
+		"""
+		{
+			"User": {
+				"Name": "John",
+				"Age": "25"
+			}
+		}
+		"""
+GooglePage<PostRequest>:
+	Method: POST
+	Url: https://google.com/
+	Headers:
+		Host: google.com
+		UserAgent: Mozilla/5.0
+		Referrer: https://google.com/
+		Origin: https://google.com
+	MimeType: application/x-www-form-urlencoded; charset=UTF-8
+	Body<HtmlBody>:
+		"""
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Document</title>
+			</head>
+			<body>
+				<h1>Hello</h1>
+			</body>
+		</html>
+		"""

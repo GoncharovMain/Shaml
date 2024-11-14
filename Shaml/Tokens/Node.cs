@@ -6,12 +6,10 @@ namespace Shaml.Tokens
 {
 	public class Node : Token
 	{
-		public Node(ReadOnlyMemory<char> buffer) : base(buffer) { }
-
-		public override TokenType Type => TokenType.Node;
 		public Mark Key { get; init; }
-		public Token[] Collection { get; set; }
-		public string HashCode => _buffer.Span.Slice(Key);
+		public Token[] Collection { get; init; }
+		public override TokenType Type => TokenType.Node;
+		public Node(ReadOnlyMemory<char> buffer) : base(buffer) { }
 		public Token this[string path]
 		{
 			get
@@ -60,7 +58,7 @@ namespace Shaml.Tokens
 
 		public override string ToObject()
 		{
-			return $"{_buffer.Span.Slice(Key)}: [node type]";
+			return $"{_buffer.Span.Slice(Key)}: [node type({Collection.Length})]";
 		}
 		internal override void Assign(ReflectionAssignerBuilder reflectionAssignerBuilder)
 		{
@@ -83,7 +81,7 @@ namespace Shaml.Tokens
 
 					switch (genericTypeDefinition)
 					{
-						case System.Type when genericTypeDefinition == typeof(Dictionary<,>):
+						case not null when genericTypeDefinition == typeof(Dictionary<,>):
 
 							object dictionary = reflectionAssigner.GetValue();
 
@@ -99,7 +97,7 @@ namespace Shaml.Tokens
 
 							break;
 
-						case System.Type when genericTypeDefinition == typeof(List<>):
+						case not null when genericTypeDefinition == typeof(List<>):
 
 							object list = CreateInstanceOfList(reflectionAssigner.MemberType);
 
@@ -116,15 +114,15 @@ namespace Shaml.Tokens
 				/// enums and structs are all value types.
 				case { MemberType.IsValueType: false }:
 
-					object existsMember = reflectionAssigner.GetValue();
+					object memberInstance = reflectionAssigner.GetValue();
 
-					if (existsMember != null)
+					if (memberInstance != null)
 					{
-						Assign(existsMember);
+						Assign(memberInstance);
 						break;
 					}
 
-					object memberInstance = CreateInstance(reflectionAssigner.MemberType);
+					memberInstance = CreateInstance(reflectionAssigner.MemberType);
 
 					reflectionAssigner.SetValue(memberInstance);
 					break;
@@ -164,55 +162,53 @@ namespace Shaml.Tokens
 
 			switch (valueType)
 			{
-				case System.Type when keyType == typeof(string) && valueType == typeof(string):
+				case not null when keyType == typeof(string) && valueType == typeof(string):
+				{
+					foreach (Pair pair in Collection)
 					{
-						foreach (Pair pair in Collection)
-						{
-							(string key, string value) = span.Slice(pair);
+						(string key, string value) = span.Slice(pair);
 
-							method_add.Invoke(dictionary, new object[] { key, value });
-						}
-
-						break;
+						method_add.Invoke(dictionary, new object[] { key, value });
 					}
+
+					break;
+				}
 
 				/// The primitive types are Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Char, Double, and Single.
-				case System.Type when keyType.IsPrimitive && valueType.IsPrimitive:
+				case not null when keyType.IsPrimitive && valueType.IsPrimitive:
+				{
+					MethodInfo methodKey_tryParse = GetTryParse(keyType);
+					MethodInfo methodValue_tryParse = GetTryParse(valueType);
+
+					MethodInfo GetTryParse(Type type)
 					{
-						MethodInfo methodKey_tryParse = keyType.GetMethod(
-							name: "TryParse",
-							types: new[] { typeof(string), keyType.MakeByRefType() }
-						);
-
-						MethodInfo methodValue_tryParse = valueType.GetMethod(
-							name: "TryParse",
-							types: new[] { typeof(string), valueType.MakeByRefType() }
-						);
-
-
-						if (methodKey_tryParse == null || methodValue_tryParse == null)
-						{
-							return;
-						}
-
-						foreach (Pair pair in Collection)
-						{
-							(string key, string value) = span.Slice(pair);
-
-							object[] parametersKey = new object[] { key, null };
-							object[] parametersValue = new object[] { value, null };
-
-							bool successKey = (bool)methodKey_tryParse.Invoke(null, parametersKey);
-							bool successValue = (bool)methodValue_tryParse.Invoke(null, parametersValue);
-
-							if (successKey && successValue)
-							{
-								method_add.Invoke(dictionary, new object[] { parametersKey[1], parametersValue[1] });
-							}
-						}
-
-						break;
+						return type.GetMethod(name: "TryParse", types: new[] { typeof(string), type });
 					}
+
+					if (methodKey_tryParse == null || methodValue_tryParse == null)
+					{
+						return;
+					}
+
+					/// What if is Token is SegmentsPair?
+					foreach (Pair pair in Collection)
+					{
+						(string key, string value) = span.Slice(pair);
+
+						object[] parametersKey = new object[] { key, null };
+						object[] parametersValue = new object[] { value, null };
+
+						bool successKey = (bool)methodKey_tryParse.Invoke(null, parametersKey);
+						bool successValue = (bool)methodValue_tryParse.Invoke(null, parametersValue);
+
+						if (successKey && successValue)
+						{
+							method_add.Invoke(dictionary, new object[] { parametersKey[1], parametersValue[1] });
+						}
+					}
+
+					break;
+				}
 			}
 		}
 		internal object CreateInstance(Type type)

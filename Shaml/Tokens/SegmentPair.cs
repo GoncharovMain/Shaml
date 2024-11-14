@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Text;
 using Shaml.Extension;
+using Shaml.Models;
 using Shaml.Reflections;
 
 namespace Shaml.Tokens
@@ -7,44 +9,41 @@ namespace Shaml.Tokens
 	public class SegmentPair : Token
 	{
 		public override TokenType Type => TokenType.SegmentPair;
-		public Mark Key { get; set; }
-		public Mark[] Segments { get; set; }
+		public Mark Key { get; init; }
+		public Mark[] Segments { get; init; }
 		public SegmentPair(ReadOnlyMemory<char> buffer) : base(buffer) { }
 
 		internal override void Assign(ReflectionAssignerBuilder reflectionAssignerBuilder)
 		{
-			ReadOnlySpan<char> span = _buffer.Span;
-
-			string memberName = span.Slice(Key);
+			string memberName = _buffer.Span.Slice(Key);
 
 			ReflectionAssigner reflectionAssigner = reflectionAssignerBuilder.Build(memberName);
 
-			if (reflectionAssigner == null || reflectionAssigner.IsContainsValue)
+			if (reflectionAssigner == null || reflectionAssigner.IsContainsInstance)
 			{
 				return;
 			}
 
-			int length = Segments.Sum(segment => segment.Length);
+			HtmlBodyConverterAttribute attributeConverter = reflectionAssigner.MemberType.GetCustomAttribute<HtmlBodyConverterAttribute>();
 
-			StringBuilder valueBuilder = new(length);
-
-
-			for (int i = 0; i < Segments.Length; i++)
+			if (attributeConverter != null)
 			{
-				Mark segment = Segments[i];
+				HtmlBody htmlBody = new();
 
-				valueBuilder.Append(span.Slice(segment));
+				//attributeConverter.Convert(htmlBody, this, reflectionAssigner);
+
+				return;
 			}
 
-			string value = valueBuilder.ToString();
+			string value = CollectSegments();
 
 			reflectionAssigner.SetValue(value);
 		}
 
-		public override string ToObject()
+		private string CollectSegments()
 		{
 			ReadOnlySpan<char> span = _buffer.Span;
-
+			
 			int length = Segments.Sum(segment => segment.Length);
 
 			StringBuilder valueBuilder = new(length);
@@ -58,6 +57,12 @@ namespace Shaml.Tokens
 			}
 
 			string value = valueBuilder.ToString();
+
+			return value;
+		}
+		public override string ToObject()
+		{
+			string value = CollectSegments();
 
 			return value;
 		}

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shaml.XTests\Shaml.XTests.csproj" />
     <ProjectReference Include="..\Shaml\Shaml.csproj" />
   </ItemGroup>
 

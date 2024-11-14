@@ -1,12 +1,11 @@
-namespace Shaml
+namespace Shaml.Tokens
 {
-	public class Mark
+	public readonly struct Mark
 	{
-		public Mark(int start, int end) => (Start, End) = (start, end);
-		public int Start { get; init; }
-		public int End { get; init; }
-		public int Length => End - Start + 1;
-
-		public override string ToString() => $"[{Start}:{End}:{Length}]";
+		public Mark(int start, int end) => (Start, _end) = (start, end);
+		public readonly int Start;
+		private readonly int _end;
+		public int Length => _end - Start + 1;
+		public override string ToString() => $"[{Start}:{_end}:{Length}]";
 	}
 }
