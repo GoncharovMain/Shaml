@@ -24,7 +24,7 @@ public class ShamlTests
         Assert.Equal(8871, primitiveTypes.ShortProperty);
         Assert.Equal(8871, primitiveTypes.ShortField);
         Assert.Equal(0xffffffff, primitiveTypes.UIntProperty);
-        Assert.Equal(0xffffffff, primitiveTypes.UIntField);
+        Assert.Equal(0b11111111111111111111111111111111, primitiveTypes.UIntField);
         Assert.Equal(0x7fffffff, primitiveTypes.IntProperty);
         Assert.Equal(0x7fffffff, primitiveTypes.IntField);
         Assert.Equal(0xffffffffffffffffL, primitiveTypes.ULongProperty);

@@ -5,7 +5,7 @@ UShortField: 8871
 ShortProperty: 8871
 ShortField: 8871
 UIntProperty: 0xffffffff
-UIntField: 0xffffffff
+UIntField: 0b11111111111111111111111111111111
 IntProperty: 0x7fffffff
 IntField: 0x7fffffff
 ULongProperty: 0xffffffffffffffff
