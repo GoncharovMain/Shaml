@@ -13,11 +13,6 @@
 			PrimitiveType.Double |
 			PrimitiveType.Decimal);
 
-		private const ulong _hasTryParse = _numberPrimitiveTypes | (ulong)(
-			PrimitiveType.Bool |
-			PrimitiveType.DateTime |
-			PrimitiveType.Char);
-
 		private const ulong _isInteger = (ulong)(
 			PrimitiveType.Byte |
 			PrimitiveType.UShort |
@@ -39,7 +34,7 @@
 
 		public readonly PrimitiveType PrimitiveType;
 		
-		public ReflectionAssigner(object instance, Type memberType, GetterDelegate getValue, SetterDelegate setValue)
+		internal ReflectionAssigner(object instance, Type memberType, GetterDelegate getValue, SetterDelegate setValue)
 		{
 			_instance = instance;
 			_type = instance.GetType();

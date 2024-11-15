@@ -105,17 +105,6 @@ namespace Shaml.Tokens
 					
 					break;
 				}
-				case { PrimitiveType: PrimitiveType.Bool }:
-				{
-					string value = span.Slice(Value).ToLower();
-
-					bool flag = value == "true";
-					
-					reflectionAssigner.SetValue(flag);
-					
-					break;
-				}
-				
 				case { IsNumber: true }:
 				{
 					string value = span.Slice(Value.Start, Value.Length).ToString();
@@ -143,6 +132,16 @@ namespace Shaml.Tokens
 						}
 					}
 				
+					break;
+				}
+				case { PrimitiveType: PrimitiveType.Bool }:
+				{
+					string value = span.Slice(Value).ToLower();
+
+					bool flag = value == "true";
+					
+					reflectionAssigner.SetValue(flag);
+					
 					break;
 				}
 				case { PrimitiveType: PrimitiveType.DateTime }:

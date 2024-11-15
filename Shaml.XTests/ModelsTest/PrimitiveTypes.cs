@@ -4,16 +4,16 @@ public class PrimitiveTypes
 {
     public byte ByteProperty { get; set; }
     public byte ByteField;
-    public ushort UshortProperty { get; set; }
-    public ushort UshortField;
+    public ushort UShortProperty { get; set; }
+    public ushort UShortField;
     public short ShortProperty { get; set; }
     public short ShortField;
-    public uint UintProperty { get; set; }
-    public uint UintField;
+    public uint UIntProperty { get; set; }
+    public uint UIntField;
     public int IntProperty { get; set; }
     public int IntField;
-    public ulong UlongProperty { get; set; }
-    public ulong UlongField;
+    public ulong ULongProperty { get; set; }
+    public ulong ULongField;
     public long LongProperty { get; set; }
     public long LongField;
     public float FloatProperty { get; set; }

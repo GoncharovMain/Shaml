@@ -55,7 +55,6 @@ namespace Shaml.Tokens
 				return null;
 			}
 		}
-
 		public override string ToObject()
 		{
 			return $"{_buffer.Span.Slice(Key)}: [node type({Collection.Length})]";
@@ -128,7 +127,6 @@ namespace Shaml.Tokens
 					break;
 			}
 		}
-
 		internal void Assign(object instance)
 		{
 			ReflectionAssignerBuilder reflectionAssignerBuilder =
@@ -141,7 +139,6 @@ namespace Shaml.Tokens
 				token.Assign(reflectionAssignerBuilder);
 			}
 		}
-
 		internal void SupplementInstanceWithPairs(object dictionary)
 		{
 			Type dictionaryType = dictionary.GetType();
@@ -240,9 +237,7 @@ namespace Shaml.Tokens
 			switch (itemType)
 			{
 				case System.Type when itemType == typeof(string):
-
-					string[] values = new string[Collection.Length];
-
+					
 					foreach (Item item in Collection)
 					{
 						string value = span.Slice(item.Value);
