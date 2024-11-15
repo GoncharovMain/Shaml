@@ -134,7 +134,7 @@ namespace Shaml.Tokens
 				
 					break;
 				}
-				case { PrimitiveType: PrimitiveType.Bool }:
+				case { TypeCode: ShamlTypeCode.Bool }:
 				{
 					string value = span.Slice(Value).ToLower();
 
@@ -144,7 +144,7 @@ namespace Shaml.Tokens
 					
 					break;
 				}
-				case { PrimitiveType: PrimitiveType.DateTime }:
+				case { TypeCode: ShamlTypeCode.DateTime }:
 				{
 					string dateTime = span.Slice(Value);
 					
@@ -171,12 +171,19 @@ namespace Shaml.Tokens
 					
 					break;
 				}
-				case { PrimitiveType: PrimitiveType.String }:
+				case { TypeCode: ShamlTypeCode.String }:
 				{
-					string value = span.Slice(Key);
+					string value = span.Slice(Value);
 					
 					reflectionAssigner.SetValue(value);
 
+					break;
+				}
+				case { TypeCode: ShamlTypeCode.Char }:
+				{
+					char ch = span.Slice(Value)[0];
+
+					reflectionAssigner.SetValue(ch);
 					break;
 				}
 				default:

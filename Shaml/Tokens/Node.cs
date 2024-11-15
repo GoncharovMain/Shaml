@@ -76,11 +76,11 @@ namespace Shaml.Tokens
 			{
 				case { MemberType.IsGenericType: true }:
 
-					Type genericTypeDefinition = reflectionAssigner.MemberType.GetGenericTypeDefinition();
+					//Type genericTypeDefinition = reflectionAssigner.MemberType.GetGenericTypeDefinition();
 
-					switch (genericTypeDefinition)
+					switch (reflectionAssigner)
 					{
-						case not null when genericTypeDefinition == typeof(Dictionary<,>):
+						case { TypeCode: ShamlTypeCode.Dictionary }:
 
 							object dictionary = reflectionAssigner.GetValue();
 
@@ -96,7 +96,7 @@ namespace Shaml.Tokens
 
 							break;
 
-						case not null when genericTypeDefinition == typeof(List<>):
+						case { TypeCode: ShamlTypeCode.List }:
 
 							object list = CreateInstanceOfList(reflectionAssigner.MemberType);
 

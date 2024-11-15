@@ -160,6 +160,10 @@ namespace Shaml
 					new Pair(buffer) { Key = new Mark(544, 552), Value = new Mark(555, 559) },
 					new Pair(buffer) { Key = new Mark(562, 577), Value = new Mark(580, 597) },
 					new Pair(buffer) { Key = new Mark(600, 612), Value = new Mark(615, 632) },
+					new Pair(buffer) { Key = new Mark(635, 648), Value = new Mark(651, 671) },
+					new Pair(buffer) { Key = new Mark(674, 684), Value = new Mark(687, 704) },
+					new Pair(buffer) { Key = new Mark(707, 718), Value = new Mark(721, 721) },
+					new Pair(buffer) { Key = new Mark(724, 732), Value = new Mark(735, 735) },
 				}
 			};
 

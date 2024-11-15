@@ -22,3 +22,7 @@ BoolProperty: True
 BoolField: False
 DateTimeProperty: 20.07.2015 0:00:00
 DateTimeField: 20.07.2015 0:00:00
+StringProperty: Hello, Shaml property
+StringField: Hello, Shaml field
+CharProperty: $
+CharField: $

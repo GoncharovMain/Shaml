@@ -14,22 +14,6 @@ namespace Shaml.Tokens
 		public const MemberTypes SetterMemberTypes =
 			MemberTypes.Property |
 			MemberTypes.Field;
-		
-		public static readonly Type[] PrimitiveTypes =
-		{
-			typeof(byte),
-			typeof(ushort),
-			typeof(short),
-			typeof(uint),
-			typeof(int),
-			typeof(ulong),
-			typeof(long),
-			typeof(float),
-			typeof(double),
-			typeof(decimal),
-			typeof(bool),
-			typeof(DateTime),
-		};
 
 		protected ReadOnlyMemory<char> _buffer;
 

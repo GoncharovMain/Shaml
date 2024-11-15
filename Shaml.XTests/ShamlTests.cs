@@ -43,5 +43,11 @@ public class ShamlTests
         Assert.Equal(false, primitiveTypes.BoolField);
         Assert.Equal(new DateTime(2015, 07, 20, 0, 0, 0), primitiveTypes.DateTimeProperty);
         Assert.Equal(new DateTime(2015, 07, 20, 0, 0, 0), primitiveTypes.DateTimeField);
+        Assert.Equal("Hello, Shaml property", primitiveTypes.StringProperty);
+        Assert.Equal("Hello, Shaml field", primitiveTypes.StringField);
+        
+        Assert.Equal('$', primitiveTypes.CharProperty);
+        Assert.Equal('$', primitiveTypes.CharField);
+        
     }
 }

@@ -26,4 +26,8 @@ public class PrimitiveTypes
     public bool BoolField;
     public DateTime DateTimeProperty { get; set; }
     public DateTime DateTimeField;
+    public string StringProperty { get; set; }
+    public string StringField;
+    public char CharProperty { get; set; }
+    public char CharField;
 }

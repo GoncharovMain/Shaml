@@ -3,24 +3,24 @@
 	public class ReflectionAssigner
 	{
 		private const ulong _numberPrimitiveTypes = (ulong)(
-			PrimitiveType.UShort |
-			PrimitiveType.Short |
-			PrimitiveType.UInt |
-			PrimitiveType.Int |
-			PrimitiveType.ULong |
-			PrimitiveType.Long |
-			PrimitiveType.Float |
-			PrimitiveType.Double |
-			PrimitiveType.Decimal);
+			ShamlTypeCode.UShort |
+			ShamlTypeCode.Short |
+			ShamlTypeCode.UInt |
+			ShamlTypeCode.Int |
+			ShamlTypeCode.ULong |
+			ShamlTypeCode.Long |
+			ShamlTypeCode.Float |
+			ShamlTypeCode.Double |
+			ShamlTypeCode.Decimal);
 
 		private const ulong _isInteger = (ulong)(
-			PrimitiveType.Byte |
-			PrimitiveType.UShort |
-			PrimitiveType.Short |
-			PrimitiveType.UInt |
-			PrimitiveType.Int |
-			PrimitiveType.ULong |
-			PrimitiveType.Long);
+			ShamlTypeCode.Byte |
+			ShamlTypeCode.UShort |
+			ShamlTypeCode.Short |
+			ShamlTypeCode.UInt |
+			ShamlTypeCode.Int |
+			ShamlTypeCode.ULong |
+			ShamlTypeCode.Long);
 
 		private readonly object _instance;
 		private readonly Type _type;
@@ -31,8 +31,7 @@
 		
 		public readonly bool IsNumber;
 		public readonly bool IsInteger;
-
-		public readonly PrimitiveType PrimitiveType;
+		public readonly ShamlTypeCode TypeCode;
 		
 		internal ReflectionAssigner(object instance, Type memberType, GetterDelegate getValue, SetterDelegate setValue)
 		{
@@ -43,12 +42,12 @@
 
 			MemberType = memberType;
 
-			PrimitiveType primitiveType = memberType.ToPrimitiveType();
+			ShamlTypeCode shamlTypeCode = memberType.ToTypeCode();
 			
-			PrimitiveType = primitiveType;
+			TypeCode = shamlTypeCode;
 
-			IsNumber = (_numberPrimitiveTypes & (ulong)primitiveType) != 0;
-			IsInteger = (_isInteger & (ulong)primitiveType) != 0;
+			IsNumber = (_numberPrimitiveTypes & (ulong)shamlTypeCode) != 0;
+			IsInteger = (_isInteger & (ulong)shamlTypeCode) != 0;
 		}
 
 		public void SetValue(object value)
