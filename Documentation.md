@@ -33,7 +33,15 @@ foo: ${text}
 result: foo => "scalar"
 ```
 
+<h2>Supported HEX, BIN, DEC integers</h2>
 
+Specify the notation `0b` or `0x` at the beginning.
+
+```
+DecShortField: 8871
+BinUIntField: 0b11111111111111111111111111111111
+HexIntProperty: 0x7fffffff
+```
 
 <h1>Motivation</h1>
 
