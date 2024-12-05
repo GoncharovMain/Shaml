@@ -45,10 +45,6 @@ HexIntProperty: 0x7fffffff
 
 <h1>Motivation</h1>
 
-
-
-
-
 ```
 text: scalar
 foo1: $"Logging text in database: parameter1: {text} parameter2: {text}"

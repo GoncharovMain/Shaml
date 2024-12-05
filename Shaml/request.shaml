@@ -36,12 +36,12 @@ GoogleInitialize<GetRequest>:
 
 GoogleUser<PostRequest>:
 	Method: POST
-	Url: https://google.com/
+	Url: https://{Headers.Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
-		Referrer: https://google.com/
-		Origin: https://google.com
+		Referrer: https://{Host}/
+		Origin: https://{Host}
 	MimeType: application/x-www-form-urlencoded; charset=UTF-8
 	Body<JsonBody>:
 		"""
@@ -54,12 +54,12 @@ GoogleUser<PostRequest>:
 		"""
 GooglePage<PostRequest>:
 	Method: POST
-	Url: https://google.com/
+	Url: https://{Headers.Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
-		Referrer: https://google.com/
-		Origin: https://google.com
+		Referrer: https://{Host}/
+		Origin: https://{Host}
 	MimeType: application/x-www-form-urlencoded; charset=UTF-8
 	Body<HtmlBody>:
 		"""

@@ -1,11 +1,12 @@
 namespace Shaml.Tokens
 {
 	[Flags]
-	public enum TokenType : long
+	public enum TokenType : uint
 	{
-		Pair = 1 << 1,
-		SegmentPair = 1 << 2,
-		Item = 1 << 3,
-		Node = 1 << 4,
+		Node = 1U << 1,
+		Scalar = 1U << 2,
+		Index = 1U << 3,
+		Key = 1U << 4,
+		Static = 1U << 5,
 	}
 }

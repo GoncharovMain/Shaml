@@ -3,27 +3,36 @@
 	[Flags]
 	public enum ShamlTypeCode : ulong
 	{
-		Byte = 1 << 1,
-		Short = 1 << 2,
-		UShort = 1 << 3,
-		Int = 1 << 4,
-		UInt = 1 << 5,
-		Long = 1 << 6,
-		ULong = 1 << 7,
-		Int128 = 1 << 8,
-		UInt128 = 1 << 9,
-		Float = 1 << 10,
-		Double = 1 << 11,
-		Decimal = 1 << 12,
-		Bool = 1 << 13,
-		DateTime = 1 << 14,
-		Char = 1 << 15,
-		String = 1 << 16,
-
-		List = 1 << 17,
-		Dictionary = 1 << 18,
+		Byte = 1UL << 1,
+		Short = 1UL << 2,
+		UShort = 1UL << 3,
+		Int = 1UL << 4,
+		UInt = 1UL << 5,
+		Long = 1UL << 6,
+		ULong = 1UL << 7,
+		Int128 = 1UL << 8,
+		UInt128 = 1UL << 9,
+		Float = 1UL << 10,
+		Double = 1UL << 11,
+		Decimal = 1UL << 12,
+		Bool = 1UL << 13,
+		DateTime = 1UL << 14,
+		Char = 1UL << 15,
+		String = 1UL << 16,
 		
-		Object = 1 << 30,
+		Enum = 1UL << 17,
+
+		List = 1UL << 18,
+		Dictionary = 1UL << 19,
+		Array = 1UL << 20,
+		
+		Object = 1UL << 30,
+		
+		Integer = Byte | UShort | Short | UInt | Int | ULong | Long,
+		Number = Integer | Float | Double | Decimal,
+		Scalar =  Number | Char | String | Bool | DateTime | Enum,
+		
+		Node = List | Dictionary | Array | Object,
 	}
 
 	public static class TypeCodeExtensions
@@ -54,6 +63,7 @@
 				
 				{ IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(Dictionary<,>)
 					=> ShamlTypeCode.Dictionary,
+				{ IsArray: true } => ShamlTypeCode.Array,
 				
 				_ => ShamlTypeCode.Object
 			};

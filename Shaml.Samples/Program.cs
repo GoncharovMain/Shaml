@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Shaml.Assigners;
 using Shaml.Models;
 using Shaml.Tokens;
 
@@ -43,24 +44,15 @@ namespace Shaml.Samples
 						}
 					}
 				};
-
+				
+				
 				ShamlAssigner<GoogleApi> assignerGoogleApi = new(_buffer);
-
-				string[] values =
-				{
-					assignerGoogleApi.SelectToken("Request.Body").ToObject(),
-					assignerGoogleApi.SelectToken("Request.Headers.SecFetchSite").ToObject(),
-					assignerGoogleApi.SelectToken("User.Name").ToObject(),
-					assignerGoogleApi.SelectToken("Request.Headers").ToObject(),
-					assignerGoogleApi.SelectToken("List.0").ToObject(),
-				};
-
+				
 				assignerGoogleApi.Assign(googleApi);
 
 				GoogleApi googleApi2 = assignerGoogleApi.Assign(new GoogleApi());
-
+				
 				GoogleApi googleApi3 = ShamlConverter.Deserialize<GoogleApi>(_buffer);
-
 			}
 		}
 

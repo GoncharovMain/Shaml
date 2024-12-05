@@ -5,6 +5,8 @@ namespace Shaml.Tokens
 {
 	public abstract class Token
 	{
+		protected ReadOnlyMemory<char> _buffer;
+		
 		public const BindingFlags PublicMembers =
 			BindingFlags.Instance |
 			BindingFlags.Public |
@@ -14,14 +16,12 @@ namespace Shaml.Tokens
 		public const MemberTypes SetterMemberTypes =
 			MemberTypes.Property |
 			MemberTypes.Field;
-
-		protected ReadOnlyMemory<char> _buffer;
-
+		
 		public abstract TokenType Type { get; }
+		
 		protected Token(ReadOnlyMemory<char> buffer) => _buffer = buffer;
+		
+		internal abstract object CreateInstance(Type type);
 
-		internal abstract void Assign(ReflectionAssignerBuilder builder);
-		public abstract string ToObject();
-		// public T ToObject<T>();
 	}
 }
