@@ -7,6 +7,8 @@ namespace Shaml.Tokens;
 
 public class Scalar : Token
 {
+	private const string Hex = "0x";
+	private const string Binary = "0b";
     public override TokenType Type => TokenType.Scalar;
 
     public Mark Value { get; init; }
@@ -29,7 +31,7 @@ public class Scalar : Token
 				
 				switch (notation)
 				{
-					case "0x":
+					case Hex:
 					{
 						ReadOnlySpan<char> numberSpan = span.Slice(Value.Start + 2, Value.Length - 2);
 						
@@ -50,7 +52,7 @@ public class Scalar : Token
 						
 						break;
 					}
-					case "0b":
+					case Binary:
 					{
 						ReadOnlySpan<char> numberSpan = span.Slice(Value.Start + 2, Value.Length - 2);
 						
@@ -178,4 +180,6 @@ public class Scalar : Token
 
 		return default;
     }
+
+    public override string ToString() => _buffer.Span.Slice(Value.Start, Value.Length).ToString();
 }

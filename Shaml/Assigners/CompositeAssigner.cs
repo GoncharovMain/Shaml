@@ -1,24 +1,22 @@
-using System.Diagnostics.CodeAnalysis;
 using Shaml.Tokens;
 
 namespace Shaml.Assigners;
 
-public class ScalarAssigner : IAssigner
+public class CompositeAssigner : IAssigner
 {
     private object _instance;
     private readonly Type _type;
-    private readonly Scalar _scalar;
-    public ScalarAssigner(Type type, Scalar scalar)
+    private readonly CompositeScalar _scalar;
+    
+    public CompositeAssigner(Type type, CompositeScalar scalar)
     {
         _type = type;
         _scalar = scalar;
     }
-
-    public void Assign([NotNull] ref object instance)
+    public void Assign(ref object instance)
     {
         /// Save in cache.
         _instance = instance;
     }
-
     public T ToObject<T>() => (T)_instance;
 }

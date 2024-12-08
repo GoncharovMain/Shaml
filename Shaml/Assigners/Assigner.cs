@@ -36,6 +36,9 @@ public abstract class Assigner
             case ({ IsScalar: true }, Scalar scalar):
                 return new ScalarAssigner(type, scalar);
             
+            case ({ IsScalar: true }, CompositeScalar scalar):
+                return new CompositeAssigner(type, scalar);
+            
             default:
                 throw new NotImplementedException($"Not implemented for {type} and {token.Type}");
         }

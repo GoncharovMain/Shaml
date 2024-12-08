@@ -12,4 +12,6 @@ public class StaticReference : Scalar, IReference
         _buffer = buffer;
         Value = key;
     }
+
+    public override string ToString() => Key;
 }

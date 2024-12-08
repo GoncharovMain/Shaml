@@ -11,7 +11,7 @@ public class ArrayAssigner : IAssigner
     {
         _type = type;
     }
-    public void Assign([NotNull] ref object instance)
+    public void Assign([NotNull] ref object array)
     {
         throw new NotImplementedException();
     }
