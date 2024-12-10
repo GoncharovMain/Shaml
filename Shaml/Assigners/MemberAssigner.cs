@@ -1,4 +1,5 @@
 using System.Reflection;
+using Shaml.Extension;
 using Shaml.Reflections;
 
 namespace Shaml.Assigners;
@@ -8,7 +9,8 @@ public class MemberAssigner
     private readonly GetterDelegate _getValue;
     private readonly SetterDelegate _setValue;
     public Type Type { get; }
-
+    public readonly bool IsScalar;
+    
     public MemberAssigner(MemberInfo memberInfo)
     {
         switch (memberInfo)
@@ -31,6 +33,7 @@ public class MemberAssigner
                 throw new NotSupportedException($"Member type {memberInfo.GetType()} is not supported.");
         }
         
+        IsScalar = (Type.ToTypeCode() & ShamlTypeCode.Scalar) != 0;
     }
 
     public object GetValue(object instance) => _getValue(instance);

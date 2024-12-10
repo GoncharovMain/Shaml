@@ -10,26 +10,21 @@ public sealed class ObjectAssigner : IAssigner
     private object _instance;
     private readonly Type _type;
     
-    private readonly Dictionary<StaticReference, Token> _tokens;
-    private readonly Dictionary<StaticReference, IAssigner> _assigners;
-    private readonly Dictionary<StaticReference, MemberAssigner> _memberAssigners;
+    private readonly Dictionary<StaticReference, MemberAssignerWrapper> _assignerWrappers;
     
     public ObjectAssigner(Type type, Dictionary<IReference, Token> tokens)
     {
+        _instance = null;
         _type = type;
-
-        _tokens = new Dictionary<StaticReference, Token>(Assigner.Comparer);
-        _assigners = new Dictionary<StaticReference, IAssigner>(Assigner.Comparer);
-        _memberAssigners = new Dictionary<StaticReference, MemberAssigner>(Assigner.Comparer);
-
+        
+        _assignerWrappers = new Dictionary<StaticReference, MemberAssignerWrapper>(Assigner.Comparer);
+        
         foreach ((IReference reference, Token token) in tokens)
         {
             switch (reference)
             {
                 case StaticReference staticReference:
                     
-                    _tokens.Add(staticReference, token);
-            
                     string memberName = reference.Key;
 
                     MemberInfo memberInfo = _type.GetMember(
@@ -43,12 +38,11 @@ public sealed class ObjectAssigner : IAssigner
                     }
 
                     MemberAssigner memberAssigner = new(memberInfo);
-                        
-                    _memberAssigners.Add(staticReference, memberAssigner);
-
+                    
                     IAssigner assigner = Assigner.Create(memberAssigner.Type, token);
                     
-                    _assigners.Add(staticReference, assigner);
+                    _assignerWrappers.Add(staticReference, 
+                        new MemberAssignerWrapper(token, assigner, memberAssigner));
                     
                     break;
                 
@@ -64,25 +58,56 @@ public sealed class ObjectAssigner : IAssigner
             }
         }
     }
+    
     public void Assign([NotNull] ref object instance)
     {
-        foreach ((StaticReference reference, IAssigner assigner) in _assigners)
+        foreach (MemberAssignerWrapper memberAssignerWrapper in _assignerWrappers.Values)
         {
-            MemberAssigner memberAssigner = _memberAssigners[reference];
-            
-            Token token = _tokens[reference];
-            
-            object memberInstance = memberAssigner.GetValue(instance) ?? 
-                                    token.CreateInstance(memberAssigner.Type);
-
-            assigner.Assign(ref memberInstance);
-            
-            memberAssigner.SetValue(instance, memberInstance);
+            memberAssignerWrapper.Assign(ref instance);
         }
-        
+
         /// Save in cache.
         _instance = instance;
     }
 
     public T ToObject<T>() => (T)_instance;
+    
+    private class MemberAssignerWrapper : IAssigner
+    {
+        private object _instance;
+        private readonly Token _token;
+        public MemberAssigner MemberAssigner { get; }
+        public IAssigner Assigner { get; }
+        public GetterInstance GetterInstance { get; }
+
+        public MemberAssignerWrapper(Token token, IAssigner assigner, MemberAssigner memberAssigner)
+        {
+            _instance = null;
+            _token = token;
+            Assigner = assigner;
+            
+            MemberAssigner = memberAssigner;
+
+            if (MemberAssigner.IsScalar)
+            {
+                GetterInstance = CreateInstance;
+                return;
+            }
+            
+            GetterInstance = GetInstance;
+        }
+        private object GetInstance() => MemberAssigner.GetValue(_instance);
+        private object CreateInstance() => _token.CreateInstance(MemberAssigner.Type);
+
+        public void Assign([NotNull] ref object instance)
+        {
+            _instance = instance;
+            
+            object memberInstance = GetterInstance() ?? CreateInstance();
+
+            Assigner.Assign(ref memberInstance);
+
+            MemberAssigner.SetValue(instance, memberInstance);
+        }
+    }
 }
