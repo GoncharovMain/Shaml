@@ -72,7 +72,8 @@ public sealed class ObjectAssigner : IAssigner
             
             Token token = _tokens[reference];
             
-            object memberInstance = token.CreateInstance(memberAssigner.Type);
+            object memberInstance = memberAssigner.GetValue(instance) ?? 
+                                    token.CreateInstance(memberAssigner.Type);
 
             assigner.Assign(ref memberInstance);
             

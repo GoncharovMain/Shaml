@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using Shaml.Assigners;
 using Shaml.Models;
 using Shaml.Tokens;
@@ -7,10 +8,13 @@ namespace Shaml.Samples
 {
 	public class Program
 	{
+		[MemoryDiagnoser, RankColumn]
 		public class ShamlBenchmark
 		{
 			private readonly string _text;
 			private readonly ReadOnlyMemory<char> _buffer;
+			private readonly ShamlAssigner<GoogleApi> _assignerGoogleApi;
+			
 			public ShamlBenchmark()
 			{
 				using StreamReader reader = new("request.shaml");
@@ -18,8 +22,8 @@ namespace Shaml.Samples
 				_text = reader.ReadToEnd();
 
 				_buffer = _text.AsMemory();
-
-				Node node = ShamlConverter.Parse(_buffer);
+				
+				_assignerGoogleApi = new(_buffer);
 			}
 
 			[Benchmark]
@@ -29,15 +33,23 @@ namespace Shaml.Samples
 			}
 
 			[Benchmark]
+			public void Assign_2()
+			{
+				GoogleApi googleApi = new();
+				
+				_assignerGoogleApi.Assign(googleApi);
+			}
+
+			[Benchmark]
 			public void Assign()
 			{
 				GoogleApi googleApi = new()
 				{
 					Text = "Hello world",
-					Request = new()
+					Request = new Request
 					{
 						Body = "hello body",
-						Query = new()
+						Query = new Dictionary<string, string>
 						{
 							{ "key", "value" },
 							{ "key2", "value2" },

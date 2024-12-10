@@ -5,6 +5,7 @@ namespace Shaml.Assigners;
 
 public class MemberAssigner
 {
+    private readonly GetterDelegate _getValue;
     private readonly SetterDelegate _setValue;
     public Type Type { get; }
 
@@ -15,12 +16,14 @@ public class MemberAssigner
             case PropertyInfo property:
             {
                 Type = property.PropertyType;
+                _getValue = property.GetValue;
                 _setValue = property.SetValue;
                 break;
             }
             case FieldInfo field:
             {
                 Type = field.FieldType;
+                _getValue = field.GetValue;
                 _setValue = field.SetValue;
                 break;
             }
@@ -30,5 +33,6 @@ public class MemberAssigner
         
     }
 
+    public object GetValue(object instance) => _getValue(instance);
     public void SetValue(object instance, object value) => _setValue(instance, value);
 }

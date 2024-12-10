@@ -1,6 +1,7 @@
 ﻿Request:
 	Url: google.com
 	Query:
+		key: override value
 		name: John
 		age: 40
 	Headers:
@@ -21,6 +22,8 @@ List:
 	- item1
 	- item2
 	- item3
+	- item4
+	- item5
 
 
 Host: google.com
