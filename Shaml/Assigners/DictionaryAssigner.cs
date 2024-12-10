@@ -14,8 +14,6 @@ public class DictionaryAssigner : IAssigner
     private readonly Type _keyType;
     private readonly Type _valueType;
 
-    private readonly MethodInfo _method_add;
-    private readonly MethodInfo _method_containsKey;
     private readonly MethodInfo _method_setItem;
     
     private readonly Dictionary<StaticReference, Token> _tokens;
@@ -28,8 +26,6 @@ public class DictionaryAssigner : IAssigner
         ArgumentNullException.ThrowIfNull(tokens);
         
         _type = type;
-        _method_add = _type.GetMethod("Add");
-        _method_containsKey = _type.GetMethod("ContainsKey");
         _method_setItem = _type.GetMethod("set_Item");
         
         _tokens = new Dictionary<StaticReference, Token>(Assigner.Comparer);
@@ -76,17 +72,8 @@ public class DictionaryAssigner : IAssigner
             
             keyAssigner.Assign(ref keyInstance);
             valueAssigner.Assign(ref valueInstance);
-            
-            /// Override exist instances.
-            bool isContainsKey = (bool)_method_containsKey.Invoke(dictionary, new[] { keyInstance });
-            
-            if (isContainsKey)
-            {
-                _method_setItem.Invoke(dictionary, new[] { keyInstance, valueInstance });
-                continue;
-            }
 
-            _method_add.Invoke(dictionary, new[] { keyInstance, valueInstance });
+            _method_setItem.Invoke(dictionary, new[] { keyInstance, valueInstance });
         }
         
         /// Save in cache.
