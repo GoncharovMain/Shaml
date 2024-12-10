@@ -76,38 +76,38 @@ public sealed class ObjectAssigner : IAssigner
     {
         private object _instance;
         private readonly Token _token;
-        public MemberAssigner MemberAssigner { get; }
-        public IAssigner Assigner { get; }
-        public GetterInstance GetterInstance { get; }
+        private readonly GetterInstance _getterInstance;
+        private readonly MemberAssigner _memberAssigner;
+        private readonly IAssigner _assigner;
 
         public MemberAssignerWrapper(Token token, IAssigner assigner, MemberAssigner memberAssigner)
         {
             _instance = null;
             _token = token;
-            Assigner = assigner;
+            _assigner = assigner;
             
-            MemberAssigner = memberAssigner;
+            _memberAssigner = memberAssigner;
 
-            if (MemberAssigner.IsScalar)
+            if (_memberAssigner.IsScalar)
             {
-                GetterInstance = CreateInstance;
+                _getterInstance = CreateInstance;
                 return;
             }
             
-            GetterInstance = GetInstance;
+            _getterInstance = GetInstance;
         }
-        private object GetInstance() => MemberAssigner.GetValue(_instance);
-        private object CreateInstance() => _token.CreateInstance(MemberAssigner.Type);
+        private object GetInstance() => _memberAssigner.GetValue(_instance);
+        private object CreateInstance() => _token.CreateInstance(_memberAssigner.Type);
 
         public void Assign([NotNull] ref object instance)
         {
             _instance = instance;
             
-            object memberInstance = GetterInstance() ?? CreateInstance();
+            object memberInstance = _getterInstance() ?? CreateInstance();
 
-            Assigner.Assign(ref memberInstance);
+            _assigner.Assign(ref memberInstance);
 
-            MemberAssigner.SetValue(instance, memberInstance);
+            _memberAssigner.SetValue(instance, memberInstance);
         }
     }
 }
