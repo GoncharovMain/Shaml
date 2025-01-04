@@ -5,10 +5,9 @@ using Shaml.Tokens;
 
 namespace Shaml.Assigners;
 
-public class ListAssigner : IAssigner
+internal sealed class ListAssigner : IAssigner
 {
-    // cache
-    private object _instance;
+    public Cache Cache { get; private set; }
     private readonly Type _type;
     private readonly Type _itemType;
     private readonly MethodInfo _method_add;
@@ -19,12 +18,13 @@ public class ListAssigner : IAssigner
     public ListAssigner(Type type, Dictionary<IReference, Token> listTokens)
     {
         _type = type;
+        
         _method_add = _type.GetMethod("Add");
         _itemType = _type.GetGenericArguments()[0];
         
         _tokens = new(Assigner.Comparer);
         _assigners = new(Assigner.Comparer);
-        
+
         foreach ((IReference reference, Token token) in listTokens)
         {
             IndexReference indexReference = (IndexReference)reference;
@@ -35,7 +35,7 @@ public class ListAssigner : IAssigner
             _assigners.Add(indexReference, assigner);
         }
 
-        _instance = null;
+        Cache = new Cache();
     }
 
     public void Assign([NotNull] ref object list)
@@ -54,6 +54,16 @@ public class ListAssigner : IAssigner
         }
         
         /// Save in cache.
-        _instance = list;
+        Cache.Instance = list;
+    }
+    
+    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    {
+        foreach ((IReference reference, IAssigner assigner) in _assigners)
+        {
+            string path = pathRoot + Assigner.Dot + reference.Literal;
+
+            assigner.InitializeContext(path, globalContext);
+        }
     }
 }

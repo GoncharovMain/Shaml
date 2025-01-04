@@ -4,19 +4,26 @@ namespace Shaml.Assigners;
 
 public class CompositeAssigner : IAssigner
 {
-    private object _instance;
     private readonly Type _type;
     private readonly CompositeScalar _scalar;
-    
+    public Cache Cache { get; private set; }
     public CompositeAssigner(Type type, CompositeScalar scalar)
     {
         _type = type;
         _scalar = scalar;
+        Cache = new Cache();
     }
+
     public void Assign(ref object instance)
     {
         /// Save in cache.
-        _instance = instance;
+        Cache.Instance = instance;
     }
-    public T ToObject<T>() => (T)_instance;
+
+    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    {
+        globalContext[pathRoot] = Cache;
+    }
+
+    public T ToObject<T>() => (T)Cache.Instance;
 }

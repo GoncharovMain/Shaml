@@ -6,13 +6,15 @@
 		age: 40
 	Headers:
 		SecFetchSite: site
-		SecFetchDesc: user
+		SecFetchDesc: user ${.referenceOfHeader} hello ${.Host}.
 		SecFetchMode: one
 	Body:
 		"""
 		This is segment pair
 		{ "name": "John", "age": 99 }
 		"""
+		
+
 
 User:
 	Name: John
@@ -20,10 +22,10 @@ User:
 
 List:
 	- item1
-	- item2
+	- ${.Request.Headers.SecFetchSite}
 	- item3
-	- item4
 	- item5
+	- ${.User.Name}
 
 
 Host: google.com
@@ -31,7 +33,7 @@ Host: google.com
 
 GoogleInitialize:
 	Method: GET
-	Url: https://${Host}/
+	Url: https://${.Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
@@ -39,7 +41,7 @@ GoogleInitialize:
 
 GoogleUser:
 	Method: POST
-	Url: https://{Headers.Host}/
+	Url: https://${.Headers.Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0

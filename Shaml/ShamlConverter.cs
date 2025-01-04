@@ -6,9 +6,9 @@ namespace Shaml
 {
 	public static class ShamlConverter
 	{
-		public static Node Parse(ReadOnlyMemory<char> buffer)
+		public static Node Parse(ReadOnlyMemory<char> buffer, Dictionary<string, Cache> globalContext)
 		{
-			Node node = Parser.Parse(buffer);
+			Node node = Parser.Parse(buffer, globalContext);
 
 			return node;
 		}

@@ -4,7 +4,7 @@ using Shaml.Reflections;
 
 namespace Shaml.Assigners;
 
-public class MemberAssigner
+internal sealed class MemberAssigner
 {
     private readonly GetterDelegate _getValue;
     private readonly SetterDelegate _setValue;

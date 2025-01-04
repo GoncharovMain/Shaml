@@ -5,14 +5,15 @@ using Shaml.Tokens;
 
 namespace Shaml.Assigners;
 
-public abstract class Assigner
+internal abstract class Assigner : IAssigner
 {
+    protected Type _type;
+    
+    public const char Dot = '.';
     /// <summary>
     /// Is a cache for an instance of type <see cref="_type"/>
     /// </summary>
-    protected object _instance;
-
-    protected Type _type;
+    public Cache Cache { get; private set; }
     
     public static ReferenceComparer Comparer { get; } = new();
     public static IAssigner Create(Type type, Token token)
@@ -38,13 +39,18 @@ public abstract class Assigner
             
             case ({ IsScalar: true }, CompositeScalar scalar):
                 return new CompositeAssigner(type, scalar);
-            
+
             default:
                 throw new NotImplementedException($"Not implemented for {type} and {token.Type}");
         }
     }
 
-    internal abstract void Assign([NotNull] ref object instance);
+    
+    public abstract void Assign([NotNull] ref object instance);
+    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    {
+        globalContext[pathRoot] = Cache;
+    }
 
-    public T ToObject<T>() => (T)_instance;
+    public T ToObject<T>() => (T)Cache.Instance;
 }

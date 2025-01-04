@@ -1,8 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using Shaml.Assigners;
 using Shaml.Models;
+using Shaml.Parsers;
 using Shaml.Tokens;
+using Shaml.Extension;
 
 namespace Shaml.Samples
 {
@@ -14,7 +15,7 @@ namespace Shaml.Samples
 			private readonly string _text;
 			private readonly ReadOnlyMemory<char> _buffer;
 			private readonly ShamlAssigner<GoogleApi> _assignerGoogleApi;
-			
+
 			public ShamlBenchmark()
 			{
 				using StreamReader reader = new("request.shaml");
@@ -22,7 +23,7 @@ namespace Shaml.Samples
 				_text = reader.ReadToEnd();
 
 				_buffer = _text.AsMemory();
-				
+
 				_assignerGoogleApi = new(_buffer);
 			}
 
@@ -36,13 +37,15 @@ namespace Shaml.Samples
 			public void Assign_2()
 			{
 				GoogleApi googleApi = new();
-				
+
 				_assignerGoogleApi.Assign(googleApi);
 			}
 
 			[Benchmark]
 			public void Assign()
 			{
+				Node node = Parser.Parse(_buffer, new());
+
 				GoogleApi googleApi = new()
 				{
 					Text = "Hello world",
@@ -56,14 +59,14 @@ namespace Shaml.Samples
 						}
 					}
 				};
-				
-				
+
+
 				ShamlAssigner<GoogleApi> assignerGoogleApi = new(_buffer);
-				
-				assignerGoogleApi.Assign(googleApi);
+
+				//assignerGoogleApi.Assign(googleApi);
 
 				GoogleApi googleApi2 = assignerGoogleApi.Assign(new GoogleApi());
-				
+
 				GoogleApi googleApi3 = ShamlConverter.Deserialize<GoogleApi>(_buffer);
 			}
 		}
@@ -73,7 +76,6 @@ namespace Shaml.Samples
 			//BenchmarkRunner.Run<ShamlBenchmark>();
 
 			//new ShamlBenchmark().Deserialize();
-
 			new ShamlBenchmark().Assign();
 		}
 	}

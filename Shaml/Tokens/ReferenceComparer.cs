@@ -24,11 +24,11 @@ public class ReferenceComparer : IEqualityComparer<IReference>
             return false;
         }
         
-        return x.Key == y.Key;
+        return x.Literal == y.Literal;
     }
 
     public int GetHashCode(IReference reference)
     {
-        return (reference.Key != null ? reference.Key.GetHashCode() : 0);
+        return (reference.Literal != null ? reference.Literal.GetHashCode() : 0);
     }
 }
