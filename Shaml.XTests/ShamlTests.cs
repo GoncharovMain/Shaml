@@ -6,6 +6,37 @@ namespace Shaml.XTests;
 public class ShamlTests
 {
     [Fact]
+    public void ObjectAssignTest()
+    {
+        using StreamReader reader = new("ShamlModel/ComplexTypes.shaml");
+
+        ReadOnlyMemory<char> buffer = reader.ReadToEnd().AsMemory();
+        
+        ComplexModel model = ShamlConverter.Deserialize<ComplexModel>(buffer);
+        
+        Assert.NotNull(model.User);
+        
+        Assert.Equal("John", model.User.Name);
+        Assert.Equal(25, model.User.Age);
+        
+        Assert.NotNull(model.Dictionary);
+        
+        Assert.True(model.Dictionary.ContainsKey("Key1"));
+        Assert.True(model.Dictionary.ContainsKey("Key2"));
+        Assert.True(model.Dictionary.ContainsKey("Key3"));
+        
+        Assert.Equal("value1", model.Dictionary["Key1"]);
+        Assert.Equal("value2", model.Dictionary["Key2"]);
+        Assert.Equal("value3", model.Dictionary["Key3"]);
+
+        Assert.NotNull(model.List);
+        
+        Assert.Equal(3, model.List.Count);
+        Assert.Equal("item 1", model.List[0]);
+        Assert.Equal("item 2", model.List[1]);
+        Assert.Equal("item 3", model.List[2]);
+    }
+    [Fact]
     public void PrimitiveTypeTest()
     {
         // Arrange

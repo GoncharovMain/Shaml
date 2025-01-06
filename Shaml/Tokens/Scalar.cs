@@ -204,12 +204,10 @@ public class Scalar : Token
 		    {
 			    case MarkType.Reference:
 				    string k = span.Slice(mark.Start + 2, mark.Length - 3).ToString();
-				    if (_globalContext.TryGetValue(k, out Cache v))
+				    if (_globalContext.TryGetValue(k, out Cache v) 
+				        && v.Instance is string str)
 				    {
-					    if (v.Instance is string str)
-					    {
-						    length += str.Length;
-					    }
+					    length += str.Length;
 				    }
 				    break;
 			    
@@ -231,25 +229,28 @@ public class Scalar : Token
 		        
 			    case MarkType.Reference:
 				    string key = span.Slice(mark.Start + 2, mark.Length - 3).ToString();
-				    
-				    if (_globalContext.TryGetValue(key, out Cache cache))
-				    {
-					    switch (cache.Instance)
-					    {
-						    case string str:
-							    tokenBuilder.Append(str);
-							    break;
-						    
-						    case null:
-							    tokenBuilder.Append("[null]");
-							    break;
-						    
-						    default:
-							    tokenBuilder.Append($"[{cache.GetType().Name}]");
-							    break;
-					    }
-				    }
 
+				    if (!_globalContext.TryGetValue(key, out Cache cache))
+				    {
+					    tokenBuilder.Append("[none]");
+					    break;
+				    }
+				    
+				    switch (cache.Instance)
+				    {
+					    case string str:
+						    tokenBuilder.Append(str);
+						    break;
+
+					    case null:
+						    tokenBuilder.Append("[null]");
+						    break;
+
+					    default:
+						    tokenBuilder.Append($"[{cache.GetType().Name}]");
+						    break;
+				    }
+				    
 				    break;
 		    }
 	    }

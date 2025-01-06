@@ -1,0 +1,11 @@
+User:
+	Name: John
+	Age: 25
+Dictionary:
+	Key1: value1
+	Key2: value2
+	Key3: value3
+List:
+	- item 1
+	- item 2
+	- item 3

@@ -84,12 +84,13 @@ internal sealed class ObjectAssigner : IAssigner
 
     public T ToObject<T>() => (T)Cache.Instance;
 
-    private class MemberAssignerWrapper : IAssigner
+    private sealed class MemberAssignerWrapper : IAssigner
     {
         private readonly Token _token;
         private readonly GetterInstance _getterInstance;
         private readonly MemberAssigner _memberAssigner;
         private readonly IAssigner _assigner;
+        private object _parentInstance;
         public Cache Cache { get; private set; }
         public MemberAssignerWrapper(Token token, IAssigner assigner,
             MemberAssigner memberAssigner)
@@ -108,18 +109,26 @@ internal sealed class ObjectAssigner : IAssigner
 
             _getterInstance = GetInstance;
         }
-        private object GetInstance() => _memberAssigner.GetValue(Cache.Instance);
+        private object GetInstance() => _memberAssigner.GetValue(_parentInstance);
         private object CreateInstance() => _token.CreateInstance(_memberAssigner.Type);
 
-        public void Assign([NotNull] ref object instance)
+        /// <summary>
+        /// This method has specified logic of an assignment members of object.
+        /// First, method <see cref="MemberAssignerWrapper.Assign"/> and
+        /// <see cref="ObjectAssigner.Assign"/> get the same object.
+        /// </summary>
+        public void Assign([NotNull] ref object parentInstance)
         {
-            object memberInstance = _memberAssigner.GetValue(instance) ?? CreateInstance();
+            _parentInstance = parentInstance;
+            
+            /// Instance override if token is defined
+            object memberInstance = _getterInstance() ?? CreateInstance();
 
             Cache.Instance = memberInstance;
-
+            
             _assigner.Assign(ref memberInstance);
 
-            _memberAssigner.SetValue(instance, memberInstance);
+            _memberAssigner.SetValue(parentInstance, memberInstance);
         }
 
         public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
