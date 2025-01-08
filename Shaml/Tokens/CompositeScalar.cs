@@ -4,11 +4,11 @@ namespace Shaml.Tokens;
 
 public class CompositeScalar : Token
 {
-    private readonly Mark[] _marks;
-    
+    public Mark[] Marks { get; init; }
+
     public CompositeScalar(ReadOnlyMemory<char> buffer, Mark[] marks) : base(buffer)
     {
-        _marks = marks;
+        Marks = marks;
     }
 
     public override TokenType Type => TokenType.Composite;
@@ -18,11 +18,26 @@ public class CompositeScalar : Token
 
         ReadOnlySpan<char> span = _buffer.Span;
         
-        foreach (Mark mark in _marks)
+        foreach (Mark mark in Marks)
         {
             stringBuilder.AppendLine(span.Slice(mark.Start, mark.Length).ToString());
         }
 
         return stringBuilder.ToString();
     }
+
+    public override string ToString()
+    {
+        StringBuilder stringBuilder = new();
+
+        ReadOnlySpan<char> span = _buffer.Span;
+        
+        foreach (Mark mark in Marks)
+        {
+            stringBuilder.AppendLine(span.Slice(mark.Start, mark.Length).ToString());
+        }
+
+        return stringBuilder.ToString();
+    }
+    
 }

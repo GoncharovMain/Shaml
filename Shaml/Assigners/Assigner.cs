@@ -8,13 +8,28 @@ namespace Shaml.Assigners;
 internal abstract class Assigner : IAssigner
 {
     protected Type _type;
+    protected Dictionary<IReference, IAssigner> _assigners;
     
     public const char Dot = '.';
+    
     /// <summary>
     /// Is a cache for an instance of type <see cref="_type"/>
     /// </summary>
-    public Cache Cache { get; private set; }
-    
+    public Cache Cache { get; protected set; }
+
+    public void InitializeContext(Dictionary<string, Cache> globalContext)
+    {
+        foreach ((IReference reference, IAssigner assigner) in _assigners)
+        {
+            assigner.InitializeContext(reference.Literal, globalContext);
+        }
+    }
+    public virtual void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    {
+        globalContext[pathRoot] = Cache;
+    }
+
+    public T ToObject<T>() => (T)Cache.Instance;
     public static ReferenceComparer Comparer { get; } = new();
     public static IAssigner Create(Type type, Token token)
     {
@@ -44,13 +59,5 @@ internal abstract class Assigner : IAssigner
                 throw new NotImplementedException($"Not implemented for {type} and {token.Type}");
         }
     }
-
-    
     public abstract void Assign([NotNull] ref object instance);
-    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
-    {
-        globalContext[pathRoot] = Cache;
-    }
-
-    public T ToObject<T>() => (T)Cache.Instance;
 }

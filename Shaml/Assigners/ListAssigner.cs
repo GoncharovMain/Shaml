@@ -5,15 +5,12 @@ using Shaml.Tokens;
 
 namespace Shaml.Assigners;
 
-internal sealed class ListAssigner : IAssigner
+internal sealed class ListAssigner : Assigner, IAssigner
 {
-    public Cache Cache { get; private set; }
-    private readonly Type _type;
     private readonly Type _itemType;
     private readonly MethodInfo _method_add;
     
     private readonly Dictionary<IndexReference, Token> _tokens;
-    private readonly Dictionary<IndexReference, IAssigner> _assigners;
     
     public ListAssigner(Type type, Dictionary<IReference, Token> listTokens)
     {
@@ -35,33 +32,33 @@ internal sealed class ListAssigner : IAssigner
             _assigners.Add(indexReference, assigner);
         }
 
-        Cache = new Cache();
+        Cache = new Cache()
+        {
+            Type = _type
+        };
     }
 
-    public void Assign([NotNull] ref object list)
+    public override void Assign([NotNull] ref object list)
     {
         list ??= Activator.CreateInstance(_type, _tokens.Count);
 
-        foreach ((IndexReference reference, Token token) in _tokens)
+        foreach (IAssigner assigner in _assigners.Values)
         {
-            object item = token.CreateInstance(_itemType);
+            object item = assigner.Cache.Instance;
             
-            IAssigner assigner = _assigners[reference];
-
             assigner.Assign(ref item);
             
             _method_add.Invoke(list, new[] { item });
         }
-        
-        /// Save in cache.
-        Cache.Instance = list;
     }
     
-    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    public override void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
     {
+        globalContext.Add(pathRoot, Cache);
+        
         foreach ((IReference reference, IAssigner assigner) in _assigners)
         {
-            string path = pathRoot + Assigner.Dot + reference.Literal;
+            string path = pathRoot + Dot + reference.Literal;
 
             assigner.InitializeContext(path, globalContext);
         }

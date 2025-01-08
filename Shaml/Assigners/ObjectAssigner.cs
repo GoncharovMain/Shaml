@@ -5,21 +5,18 @@ using Shaml.Tokens;
 
 namespace Shaml.Assigners;
 
-internal sealed class ObjectAssigner : IAssigner
+internal sealed class ObjectAssigner : Assigner, IAssigner
 {
-    private readonly Type _type;
-
-    private readonly Dictionary<StaticReference, MemberAssignerWrapper> _assignerWrappers;
-    
-    public Cache Cache { get; private set; }
-    
     public ObjectAssigner(Type type, Dictionary<IReference, Token> tokens)
     {
-        Cache = new Cache();
-        
         _type = type;
         
-        _assignerWrappers = new Dictionary<StaticReference, MemberAssignerWrapper>(Assigner.Comparer);
+        Cache = new Cache()
+        {
+            Type = _type
+        };
+        
+        _assigners = new Dictionary<IReference, IAssigner>(Assigner.Comparer);
 
         foreach ((IReference reference, Token token) in tokens)
         {
@@ -43,7 +40,7 @@ internal sealed class ObjectAssigner : IAssigner
 
                     IAssigner assigner = Assigner.Create(memberAssigner.Type, token);
 
-                    _assignerWrappers.Add(staticReference,
+                    _assigners.Add(staticReference,
                         new MemberAssignerWrapper(token, assigner, memberAssigner));
 
                     break;
@@ -61,29 +58,26 @@ internal sealed class ObjectAssigner : IAssigner
         }
     }
 
-    public void Assign([NotNull] ref object instance)
+    public override void Assign([NotNull] ref object instance)
     {
-        foreach (MemberAssignerWrapper memberAssignerWrapper in _assignerWrappers.Values)
+        foreach (MemberAssignerWrapper memberAssignerWrapper in _assigners.Values)
         {
             memberAssignerWrapper.Assign(ref instance);
         }
-
-        /// Save in cache.
-        Cache.Instance = instance;
     }
 
-    public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
+    public override void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
     {
-        foreach ((StaticReference reference, MemberAssignerWrapper memberAssignerWrapper) in _assignerWrappers)
+        globalContext.Add(pathRoot, Cache);
+        
+        foreach ((IReference reference, IAssigner memberAssignerWrapper) in _assigners)
         {
-            string path = pathRoot + Assigner.Dot + reference.Literal;
+            string path = pathRoot + Dot + reference.Literal;
             
             memberAssignerWrapper.InitializeContext(path, globalContext);
         }
     }
-
-    public T ToObject<T>() => (T)Cache.Instance;
-
+    
     private sealed class MemberAssignerWrapper : IAssigner
     {
         private readonly Token _token;
@@ -91,26 +85,30 @@ internal sealed class ObjectAssigner : IAssigner
         private readonly MemberAssigner _memberAssigner;
         private readonly IAssigner _assigner;
         private object _parentInstance;
-        public Cache Cache { get; private set; }
+        public Cache Cache { get; private init; }
         public MemberAssignerWrapper(Token token, IAssigner assigner,
             MemberAssigner memberAssigner)
         {
-            Cache = new Cache();
             _token = token;
             _assigner = assigner;
 
             _memberAssigner = memberAssigner;
 
+            Cache = new Cache()
+            {
+                Type = _memberAssigner.Type
+            };
+            
             if (_memberAssigner.IsScalar)
             {
-                _getterInstance = CreateInstance;
+                _getterInstance = GetCache;
                 return;
             }
 
-            _getterInstance = GetInstance;
+            _getterInstance = GetParentInstance;
         }
-        private object GetInstance() => _memberAssigner.GetValue(_parentInstance);
-        private object CreateInstance() => _token.CreateInstance(_memberAssigner.Type);
+        private object GetParentInstance() => _memberAssigner.GetValue(_parentInstance);
+        private object GetCache() => _assigner.Cache.Instance;
 
         /// <summary>
         /// This method has specified logic of an assignment members of object.
@@ -121,20 +119,15 @@ internal sealed class ObjectAssigner : IAssigner
         {
             _parentInstance = parentInstance;
             
-            /// Instance override if token is defined
-            object memberInstance = _getterInstance() ?? CreateInstance();
-
-            Cache.Instance = memberInstance;
+            object memberInstance = _getterInstance() ?? GetCache();
             
             _assigner.Assign(ref memberInstance);
-
+            
             _memberAssigner.SetValue(parentInstance, memberInstance);
         }
 
         public void InitializeContext(string pathRoot, Dictionary<string, Cache> globalContext)
         {
-            globalContext[pathRoot] = Cache;
-            
             _assigner.InitializeContext(pathRoot, globalContext);
         }
     }

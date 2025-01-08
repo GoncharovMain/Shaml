@@ -15,15 +15,22 @@ namespace Shaml.Samples
 			private readonly string _text;
 			private readonly ReadOnlyMemory<char> _buffer;
 			private readonly ShamlAssigner<GoogleApi> _assignerGoogleApi;
-
+			private readonly ReadOnlyMemory<char> _bufferShielding;
+			private readonly ReadOnlyMemory<char> _bufferHtmlLayout;
 			public ShamlBenchmark()
 			{
 				using StreamReader reader = new("request.shaml");
-
+				using StreamReader htmlReader = new("html_layout.shaml");
+				
 				_text = reader.ReadToEnd();
 
 				_buffer = _text.AsMemory();
+				_bufferHtmlLayout = htmlReader.ReadToEnd().AsMemory();
+				
+				using StreamReader readerShielding = new("shielding.shaml");
 
+				_bufferShielding = readerShielding.ReadToEnd().AsMemory();
+				
 				_assignerGoogleApi = new(_buffer);
 			}
 
@@ -37,7 +44,7 @@ namespace Shaml.Samples
 			public void Assign_2()
 			{
 				GoogleApi googleApi = new();
-
+				
 				_assignerGoogleApi.Assign(googleApi);
 			}
 
@@ -57,16 +64,31 @@ namespace Shaml.Samples
 							{ "key", "value" },
 							{ "key2", "value2" },
 						}
+					},
+					
+					List = new()
+					{
+						"Hello"
 					}
 				};
+				
+				ShamlAssigner<HtmlLayout> assignerHtmlLayout = new(_bufferHtmlLayout);
 
+				HtmlLayout htmlLayout = new();
 
+				assignerHtmlLayout.Assign(htmlLayout);
+				
+				
 				ShamlAssigner<GoogleApi> assignerGoogleApi = new(_buffer);
+				
+				assignerGoogleApi.Assign(googleApi);
 
-				//assignerGoogleApi.Assign(googleApi);
+				
+				ShamlAssigner<GoogleApi> assignerGoogleApi2 = new(_buffer);
 
-				GoogleApi googleApi2 = assignerGoogleApi.Assign(new GoogleApi());
+				GoogleApi googleApi2 = assignerGoogleApi2.Assign(new GoogleApi());
 
+				
 				GoogleApi googleApi3 = ShamlConverter.Deserialize<GoogleApi>(_buffer);
 			}
 		}
@@ -77,6 +99,9 @@ namespace Shaml.Samples
 
 			//new ShamlBenchmark().Deserialize();
 			new ShamlBenchmark().Assign();
+			
+			//ShamlBenchmark.ParseReferenceMarks_IndexOf();
+			//ShamlBenchmark.ParseReferenceMarks_For();
 		}
 	}
 }

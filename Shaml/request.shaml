@@ -6,7 +6,7 @@
 		age: 40
 	Headers:
 		SecFetchSite: site
-		SecFetchDesc: user ${.referenceOfHeader} hello ${.Host}.
+		SecFetchDesc: user ${referenceOfHeader} hello ${Host}.
 		SecFetchMode: one
 	Body:
 		"""
@@ -22,18 +22,17 @@ User:
 
 List:
 	- item1
-	- ${.Request.Headers.SecFetchSite}
+	- ${Request.Headers.SecFetchSite}
 	- item3
 	- item5
-	- ${.User.Name}
+	- ${User.Name}
 
 
 Host: google.com
 
-
 GoogleInitialize:
 	Method: GET
-	Url: https://${.Host}/
+	Url: https://${Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
@@ -41,12 +40,12 @@ GoogleInitialize:
 
 GoogleUser:
 	Method: POST
-	Url: https://${.Headers.Host}/
+	Url: https://${Headers.Host}/
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
-		Referrer: https://{Host}/
-		Origin: https://{Host}
+		Referrer: https://${Host}/
+		Origin: https://${Host}
 	MimeType: application/x-www-form-urlencoded; charset=UTF-8
 	Body:
 		"""
@@ -59,15 +58,15 @@ GoogleUser:
 		"""
 GooglePage:
 	Method: POST
-	Url: https://{Headers.Host}/
+	Url: https://${Headers.Host}/
 	Query:
 		param1: value1
 		param2: value2
 	Headers:
 		Host: google.com
 		UserAgent: Mozilla/5.0
-		Referrer: https://{Host}/
-		Origin: https://{Host}
+		Referrer: https://${Host}/
+		Origin: https://${Host}
 	MimeType: application/x-www-form-urlencoded; charset=UTF-8
 	Title: <h1>Hello world</h1>
 	Footer: <div>Footer</div>

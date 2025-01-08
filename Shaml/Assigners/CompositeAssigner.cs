@@ -11,7 +11,10 @@ public class CompositeAssigner : IAssigner
     {
         _type = type;
         _scalar = scalar;
-        Cache = new Cache();
+        Cache = new Cache()
+        {
+            Type = _type,
+        };
     }
 
     public void Assign(ref object instance)

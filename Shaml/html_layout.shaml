@@ -1,0 +1,26 @@
+Http: body ${Html}
+
+Html: <html lang="en">${Head} ${Body}</html>
+
+Head:
+	"""
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+	</head>
+	"""
+
+Body: <body>${Header} ${Footer}</body>
+
+Header:
+	"""
+	<div>
+		<ul>
+			<li>Sign in</li>
+			<li>About</li>
+		</ul>
+	</div>
+	"""
+
+Footer: <div class="footer">footer content</div>

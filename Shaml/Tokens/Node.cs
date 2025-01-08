@@ -22,6 +22,60 @@ namespace Shaml.Tokens
 		{
 			return Activator.CreateInstance(type);
 		}
+
+		public Dictionary<string, Token> GetKeys()
+		{
+			Dictionary<string, Token> keys = new();
+			
+			foreach ((IReference reference, Token token) in Children)
+			{
+				keys.Add(reference.Literal, token);
+
+				if (token is Node innerNode)
+				{
+					innerNode.GetKeys(reference.Literal, keys);
+				}
+			}
+
+			return keys;
+		}
+		private void GetKeys(string rootKey, Dictionary<string, Token> keys)
+		{
+			foreach ((IReference reference, Token token) in Children)
+			{
+				string key = rootKey + Assigner.Dot + reference.Literal;
+				
+				keys.Add(key, token);
+				
+				if (token is Node node)
+				{
+					node.GetKeys(key, keys);
+				}
+			}
+		}
+		public void GetReferences(HashSet<string> references, Dictionary<IReference, string[]> referencesTree)
+		{
+			foreach ((IReference reference, Token token) in Children)
+			{
+				switch (token)
+				{
+					case Node node:
+						node.GetReferences(references, referencesTree);
+						break;
+					case Scalar scalar:
+
+						string[] innerReferences = scalar.Marks.Where(mark => mark.Type is MarkType.Reference)
+							.Select(mark => _buffer.Span.Slice(mark)).ToArray();
+
+						if (innerReferences.Length > 0)
+						{
+							referencesTree[reference] = innerReferences;
+						}
+
+						break;
+				}
+			}
+		}
 		
 		public Token this[string path]
 		{
@@ -37,6 +91,74 @@ namespace Shaml.Tokens
 			}
 		}
 
+		public void ImmediateReferences(List<string> references)
+		{
+			foreach ((IReference reference, Token token) in Children)
+			{
+				string key = reference.Literal;
+				
+				switch (token)
+				{
+					case CompositeScalar compositeScalar:
+						if (compositeScalar.Marks.Any(mark => mark.Type is MarkType.Reference))
+						{
+							continue;
+						}
+
+						references.Add(key);
+						break;
+					case Scalar scalar:
+						if (scalar.Marks.Any(mark => mark.Type is MarkType.Reference))
+						{
+							continue;
+						}
+
+						references.Add(key);
+
+						break;
+					case Node innerNode:
+						if (innerNode.References.Length is 0)
+						{
+							references.Add(key);
+						}
+						
+						innerNode.ImmediateReferences(key, references);
+						break;
+					
+				}
+			}
+		}
+
+		private void ImmediateReferences(string rootReference, List<string> references)
+		{
+			foreach ((IReference reference, Token token) in Children)
+			{
+				string key = rootReference + Assigner.Dot + reference.Literal;
+				
+				switch (token)
+				{
+					case Scalar scalar:
+						if (scalar.Marks.Any(mark => mark.Type is MarkType.Reference))
+						{
+							continue;
+						}
+
+						references.Add(key);
+
+						break;
+
+					case Node innerNode:
+						if (innerNode.References.Length is 0)
+						{
+							references.Add(key);
+						}
+						
+						innerNode.ImmediateReferences(key, references);
+						break;
+				}
+			}
+		}
+		
 		public Node FilterByImmediate()
 		{
 			Node immediate = new(_buffer);
